@@ -2,154 +2,84 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Overcomplicated Clock</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
-
     body {
       margin: 0;
-      font-family: 'Share Tech Mono', monospace;
       background-color: black;
       color: lime;
-      height: 100vh;
+      font-family: 'Share Tech Mono', monospace;
       display: flex;
-      flex-direction: column;
-      align-items: center;
       justify-content: center;
-      transition: background-color 0.5s, color 0.5s;
-      overflow: hidden;
+      align-items: center;
+      height: 100vh;
     }
 
     #clock {
       font-size: 6em;
       text-shadow: 0 0 12px lime, 0 0 20px green;
-      letter-spacing: 0.1em;
-      pointer-events: none; /* Don't block clicks */
-    }
-
-    #gear-icon {
-      position: fixed;
-      top: 12px;
-      right: 16px;
-      font-size: 1.5em;
-      color: rgba(0,255,0,0.1);
-      cursor: pointer;
-      transition: color 0.3s ease;
-      z-index: 100;
-    }
-
-    #gear-icon:hover {
-      color: lime;
-    }
-
-    #settings {
-      opacity: 0;
       pointer-events: none;
-      transition: opacity 0.4s ease;
+    }
+
+    #settings-link {
       position: fixed;
-      top: 10%;
-      left: 10%;
-      right: 10%;
-      bottom: 10%;
-      background-color: rgba(0, 0, 0, 0.95);
-      border: 2px solid lime;
-      padding: 20px;
-      overflow-y: auto;
-      z-index: 99;
+      top: 15px;
+      right: 20px;
+      font-size: 1.5em;
+      color: rgba(0,255,0,0.15);
+      text-decoration: none;
+      z-index: 10;
     }
 
-    #settings.show {
-      opacity: 1;
-      pointer-events: auto;
-    }
-
-    .theme-option {
-      margin: 10px 0;
-      cursor: pointer;
-    }
-
-    .section-title {
-      font-weight: bold;
-      margin-top: 20px;
-      color: yellow;
+    #settings-link:hover {
+      color: lime;
     }
   </style>
 </head>
 <body>
-  <div id="gear-icon">⚙</div>
+  <a id="settings-link" href="settings.html" title="Settings">⚙</a>
   <div id="clock">--:--:--</div>
 
-  <div id="settings">
-    <div class="section-title">Limited Edition Themes (no looky here)</div>
-    <div class="theme-option" onclick="applyTheme('minimalistic')">Minimalistic Black</div>
-    <div class="theme-option" onclick="applyTheme('charcoal')">Charcoal Grey-Black</div>
-    <div class="theme-option" onclick="applyTheme('night')">Night</div>
-    <div class="theme-option" onclick="applyTheme('darkknight')">Dark Knight</div>
-    <div class="theme-option" onclick="applyTheme('pitchblack')">Pitch Black</div>
-    <div class="theme-option" onclick="applyTheme('blacker')">Blacker Than Black</div>
-    <div class="theme-option" onclick="applyTheme('ninja')">Ninja Black</div>
-  </div>
-
   <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      const clock = document.getElementById('clock');
-      const settings = document.getElementById('settings');
-      const gearIcon = document.getElementById('gear-icon');
+    let use24Hour = true;
 
-      function updateClock() {
-        const now = new Date();
-        let h = String(now.getHours()).padStart(2, '0');
-        let m = String(now.getMinutes()).padStart(2, '0');
-        let s = String(now.getSeconds()).padStart(2, '0');
-        clock.textContent = `${h}:${m}:${s}`;
+    function updateClock() {
+      const now = new Date();
+      let h = now.getHours();
+      let m = String(now.getMinutes()).padStart(2, '0');
+      let s = String(now.getSeconds()).padStart(2, '0');
+      let ampm = '';
+
+      if (!use24Hour) {
+        ampm = h >= 12 ? ' PM' : ' AM';
+        h = h % 12 || 12;
       }
 
-      setInterval(updateClock, 1000);
+      document.getElementById('clock').textContent = 
+        String(h).padStart(2, '0') + ':' + m + ':' + s + ampm;
+    }
+
+    function applyTheme(theme) {
+      switch (theme) {
+        case 'minimalistic': document.body.style.backgroundColor = 'black'; document.body.style.color = 'white'; break;
+        case 'charcoal': document.body.style.backgroundColor = '#2e2e2e'; document.body.style.color = '#ccc'; break;
+        case 'night': document.body.style.backgroundColor = '#1a1a2e'; document.body.style.color = '#9d9dff'; break;
+        case 'darkknight': document.body.style.backgroundColor = '#0d0d0d'; document.body.style.color = '#cfcfcf'; break;
+        case 'pitchblack': document.body.style.backgroundColor = '#000000'; document.body.style.color = '#00ffcc'; break;
+        case 'blacker': document.body.style.backgroundColor = '#000001'; document.body.style.color = '#ff00ff'; break;
+        case 'ninja': document.body.style.backgroundColor = '#050505'; document.body.style.color = '#00ff00'; break;
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      const savedTheme = localStorage.getItem("theme");
+      const format = localStorage.getItem("timeFormat") || "24";
+      if (savedTheme) applyTheme(savedTheme);
+      use24Hour = format === "24";
       updateClock();
-
-      document.addEventListener('keydown', (e) => {
-        if (e.key.toLowerCase() === 's') {
-          settings.classList.toggle('show');
-        }
-      });
-
-      gearIcon.addEventListener('click', () => {
-        settings.classList.toggle('show');
-      });
-
-      window.applyTheme = function(theme) {
-        switch (theme) {
-          case 'minimalistic':
-            document.body.style.backgroundColor = 'black';
-            document.body.style.color = 'white';
-            break;
-          case 'charcoal':
-            document.body.style.backgroundColor = '#2e2e2e';
-            document.body.style.color = '#cccccc';
-            break;
-          case 'night':
-            document.body.style.backgroundColor = '#1a1a2e';
-            document.body.style.color = '#9d9dff';
-            break;
-          case 'darkknight':
-            document.body.style.backgroundColor = '#0d0d0d';
-            document.body.style.color = '#cfcfcf';
-            break;
-          case 'pitchblack':
-            document.body.style.backgroundColor = '#000000';
-            document.body.style.color = '#00ffcc';
-            break;
-          case 'blacker':
-            document.body.style.backgroundColor = '#000001';
-            document.body.style.color = '#ff00ff';
-            break;
-          case 'ninja':
-            document.body.style.backgroundColor = '#050505';
-            document.body.style.color = '#00ff00';
-            break;
-        }
-      };
+      setInterval(updateClock, 1000);
     });
   </script>
 </body>
