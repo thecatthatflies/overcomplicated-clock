@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Settings</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+
+    body {
+      margin: 0;
+      font-family: 'Share Tech Mono', monospace;
+      background-color: #000;
+      color: #fff;
+      display: flex;
+      height: 100vh;
+    }
+
+    .sidebar {
+      width: 200px;
+      background: #111;
+      border-right: 1px solid lime;
+      padding: 20px;
+    }
+
+    .sidebar div {
+      margin: 10px 0;
+      color: lime;
+      cursor: pointer;
+    }
+
+    .content {
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+    }
+
+    .section {
+      margin-bottom: 40px;
+    }
+
+    h2 {
+      border-bottom: 1px solid lime;
+      margin-bottom: 10px;
+    }
+
+    .radio-group label {
+      margin-right: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="sidebar">
+    <div onclick="scrollToId('theme')">Theme</div>
+    <div onclick="scrollToId('timeformat')">Time Format</div>
+  </div>
+  <div class="content">
+    <div id="theme" class="section">
+      <h2>Theme</h2>
+      <div onclick="saveTheme('minimalistic')">Minimalistic Black</div>
+      <div onclick="saveTheme('charcoal')">Charcoal Grey-Black</div>
+      <div onclick="saveTheme('night')">Night</div>
+      <div onclick="saveTheme('darkknight')">Dark Knight</div>
+      <div onclick="saveTheme('pitchblack')">Pitch Black</div>
+      <div onclick="saveTheme('blacker')">Blacker Than Black</div>
+      <div onclick="saveTheme('ninja')">Ninja Black</div>
+    </div>
+
+    <div id="timeformat" class="section">
+      <h2>Time Format</h2>
+      <div class="radio-group">
+        <label><input type="radio" name="tf" value="12" onchange="saveTimeFormat(this.value)"> 12-hour</label>
+        <label><input type="radio" name="tf" value="24" checked onchange="saveTimeFormat(this.value)"> 24-hour</label>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function scrollToId(id) {
+      document.getElementById(id).scrollIntoView({ behavior: "smooth" });
+    }
+
+    function saveTheme(theme) {
+      localStorage.setItem("theme", theme);
+      alert("Theme saved!");
+    }
+
+    function saveTimeFormat(val) {
+      localStorage.setItem("timeFormat", val);
+      alert("Time format set to " + val + "-hour.");
+    }
+
+    // Highlight selected time format
+    document.addEventListener("DOMContentLoaded", () => {
+      const current = localStorage.getItem("timeFormat") || "24";
+      const radios = document.querySelectorAll('input[name="tf"]');
+      radios.forEach(r => { if (r.value === current) r.checked = true; });
+    });
+  </script>
+</body>
+</html>
